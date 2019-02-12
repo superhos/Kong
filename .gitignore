@@ -22,3 +22,8 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+.history/
+
+#Electron-builder output
+/dist_electron
