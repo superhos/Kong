@@ -52,6 +52,7 @@ export default new Vuex.Store({
       // 一秒调用一次
       if (state.countTime <= 0) {
         clearTimeout(state.timeId)
+        MusicPlayer.stop()
         state.mode = PLAYER_MODE.STOP
         state.countTime = state.roundTime
       } else {
