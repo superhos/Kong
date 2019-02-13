@@ -1,7 +1,8 @@
-import { ipcMain, app } from 'electron'
+import { app } from 'electron'
+const ipcMain = require('electron').ipcMain;
 import path from 'path'
 import fs from 'fs'
-import download from 'electron-dl'
+const { download } = require('electron-dl')
 
 const MUSIC_STORE_PATH = `${path.resolve(app.getPath('userData'),'music')}`
 
@@ -13,33 +14,30 @@ export default function (mainWindow) {
     // })
 
     // Download music
-    ipcMain.on('download', (e, args) => {
-        download(mainWindow, args.path, {
-            filename: args.filename,
-            directory: `${MUSIC_STORE_PATH}`,
-            onProgress (progress) {
-                mainWindow.webContent.send('download-onProgress', {
-                    objectId: args.objectId,
-                    progress: progress * 100
-                })
-            },
-            onStarted (downloadItem) {
-                mainWindow.webContents.send('download-onStarted', {
-                    objectId: args.objectId,
-                    downloadItem
-                })
-            }
-        }).then(downloadItem => {
-            mainWindow.webContents.send('download-success', {
-                objectId: args.objectId,
-                downloadItem
+    console.log('init')
+    ipcMain.on('download', async (e, args) => {
+        console.log(args)
+
+        try {
+            await download(mainWindow, args.path, {
+                filename: args.filename,
+                directory: `${MUSIC_STORE_PATH}`,
+                onProgress (progress) {
+                    mainWindow.webContents.send('download-onProgress', {
+                        objectId: args.objectId,
+                        progress: progress * 100
+                    })
+                }
             })
-        }).catch(e => {
-            console.warn(e)
+
+            mainWindow.webContents.send('download-success', {
+                objectId: args.objectId
+            })
+        } catch (err) {
             mainWindow.webContents.send('download-error', {
                 objectId: args.objectId,
-                error: e
+                error: err
             })
-        })
+        }
     })
 }

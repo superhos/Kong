@@ -1,8 +1,11 @@
 <template>
 <div class="focus">
-    <button @click="start" v-show="mode === PLAYER_MODE.STOP">
+    <button @click="start" v-show="mode === PLAYER_MODE.STOP && curMusic.isDownload">
         开始专注
     </button>    
+    <button @click="download" v-show="mode === PLAYER_MODE.STOP && !curMusic.isDownload && !curMusic.isDownloading">
+        下载
+    </button>      
     <button @click="start" v-show="mode === PLAYER_MODE.PAUSE">
         继续专注
     </button>    
@@ -16,6 +19,7 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
 import PLAYER_MODE from '../constant/player_mode'
 
 export default {
@@ -26,19 +30,15 @@ export default {
         }
     },
     computed: {
-        mode () {
-            return this.$store.state.mode
+        ...mapState(['mode','playList','curMusicId']),
+        curMusic () {
+            return this.playList.find(e => e.objectId === this.curMusicId) || {}
         }
     },
     methods: {
-        start () {
-            this.$store.dispatch('start')
-        },
-        stop () {
-            this.$store.dispatch('stop')
-        },
-        pause () {
-            this.$store.dispatch('pause')
+        ...mapActions(['start','stop','pause']),
+        download () {
+            this.$store.dispatch('download', this.curMusicId)
         }
     }
 }

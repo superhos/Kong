@@ -5,6 +5,7 @@ import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+import ipcEvent from './events/ipc-event'
 
 global.env = process.env
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -17,7 +18,7 @@ let win
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 300, height: 480 })
+  win = new BrowserWindow({ width: 300, height: 480, titleBarStyle: 'hidden', resizable: false })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -28,6 +29,8 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  ipcEvent(win)
 
   win.on('closed', () => {
     win = null

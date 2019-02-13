@@ -8,6 +8,16 @@
               playing:  (mode === PLAYER_MODE.PLAYING && selectIndex === key)
             }" 
             :data-index="key" :data-id="item.objectId" v-for="(item, key) in playList" :key="item.objectId">{{item.title}}
+            <radial-progress-bar :diameter="100"
+                        :class="{barHidden: (!curMusic.isDownloading || selectIndex !== key)}"
+                        style="position: absolute;top: 0;left: 0;"
+                        startColor="#F7F7F7"
+                        stopColor="#F2F2F2"
+                        innerStrokeColor="rgba(0,0,0,0)"
+                        :strokeWidth="parseInt(5)"
+                        :completed-steps="curDownloadSteps"
+                        :total-steps="totalSteps">
+            </radial-progress-bar>
             <span>{{countTime.toString().secondsToTime(0)}}</span>
           </li>
       </ul>
@@ -22,6 +32,7 @@
 <script>
 import { mapState } from 'vuex'
 import PLAYER_MODE from '../constant/player_mode'
+import RadialProgressBar from 'vue-radial-progress'
 
 String.prototype.timeToSeconds = function () {
   let [mins, seconds] = this.split(':')
@@ -40,9 +51,13 @@ export default {
   props: {
     msg: String
   },
+  components: {
+    RadialProgressBar
+  },
   data () {
     return {
       PLAYER_MODE,
+      totalSteps: 10,
       selectIndex: 0,
       currentX: 100,
       selectorStyle: {
@@ -54,7 +69,27 @@ export default {
     }
   },
   computed: {
-    ...mapState(['mode','countTime','curMusicId','playList'])
+    ...mapState(['mode','countTime','curMusicId','playList']),
+    curMusic () {
+      return this.playList.find(e => e.objectId === this.curMusicId) || {}
+    },
+    curDownloadSteps () {
+      return this.$store.state.downloadProgress[this.curMusicId] || 0
+    }
+  },
+  mounted() {
+    // let i = 0
+    // let time = setInterval(() => {
+    //   // this.completedSteps++
+    //   if (i>10) {
+    //     clearInterval(time)
+    //     this.$store.dispatch('downloadDone', this.playList[0].objectId)
+    //   }
+    //   this.$store.dispatch('updateDownloadProgress', {
+    //     objectId: this.playList[0].objectId,
+    //     progress: i++
+    //   })
+    // },1000)
   },
   methods: {
     slideTo (direc) {
@@ -143,6 +178,10 @@ h3 {
 
   li.show {
     visibility: visible;
+  }
+
+  .barHidden {
+    display: none;
   }
 
   li span{

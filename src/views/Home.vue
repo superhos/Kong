@@ -50,7 +50,7 @@ export default {
   width: 100vw;
   height: 100vh;
   position: relative;
-  background-size:cover;
+  background-size: 100% 100%;
   background-position: center;
   z-index:9;
   transform-origin: 50% 50%;
@@ -69,11 +69,9 @@ export default {
 
 .slide-fade-enter-active {
   transition: all .3s ease;
-  opacity: 1;
 }
 .slide-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-  opacity: 0;
+  transition: all .6s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 
 .focus {

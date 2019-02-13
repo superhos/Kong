@@ -1,17 +1,7 @@
 import { MUSIC_LIST } from './api'
-import Service from './service'
+import BaseService from './base-service'
 
-let instance = null
-
-export default class MusicService extends Service{
-
-    static getInstance () {
-        if (!instance) {
-            instance = new MusicService()
-        }
-        return instance
-    }
-
+export default class MusicService extends BaseService{
     async list () {
         return await this.getOpt(MUSIC_LIST)
     }
