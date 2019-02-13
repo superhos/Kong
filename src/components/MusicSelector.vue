@@ -7,7 +7,7 @@
               current: selectIndex === key, 
               playing:  (mode === PLAYER_MODE.PLAYING && selectIndex === key)
             }" 
-            :data-index="key" :data-id="item.id" v-for="(item, key) in playList" :key="item.id">{{item.title}}
+            :data-index="key" :data-id="item.objectId" v-for="(item, key) in playList" :key="item.objectId">{{item.title}}
             <span>{{countTime.toString().secondsToTime(0)}}</span>
           </li>
       </ul>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import PLAYER_MODE from '../constant/player_mode'
 
 String.prototype.timeToSeconds = function () {
@@ -53,25 +54,14 @@ export default {
     }
   },
   computed: {
-    mode () {
-      return this.$store.state.mode
-    },
-    countTime() {
-      return this.$store.state.countTime
-    },
-    curMusicId () {
-      return this.$store.state.curMusicId
-    },
-    playList () {
-      return this.$store.state.playList
-    }
+    ...mapState(['mode','countTime','curMusicId','playList'])
   },
   methods: {
     slideTo (direc) {
       if (this.selectIndex === 0 && direc < 0) return
       if (this.selectIndex >= this.playList.length - 1 && direc > 0) return
       this.selectIndex = this.selectIndex + direc
-      let selectId = this.playList[this.selectIndex].id
+      let selectId = this.playList[this.selectIndex].objectId
       this.slideToId(selectId)
     },
     slideToId (selectId) {

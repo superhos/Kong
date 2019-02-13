@@ -13,6 +13,7 @@
 
 <script>
 // @ is an alias to /src
+import { mapState } from 'vuex'
 import MusicSelector from '@/components/MusicSelector.vue'
 import Focus from '@/components/Focus.vue'
 
@@ -27,11 +28,9 @@ export default {
     Focus
   },
   computed: {
-    showBg () {
-      return this.$store.state.showBg
-    },
+    ...mapState(['showBg']),
     musicBgStyle () {
-      let bg = this.$store.state.playList.find(e => e.id == this.$store.state.curMusicId)
+      let bg = this.$store.state.playList.find(e => e.objectId == this.$store.state.curMusicId)
       return bg ? bg.style : {}
     }
   }

@@ -3,6 +3,8 @@ import Vuex from 'vuex'
 import testlist from '../mock/testlist'
 import PLAYER_MODE from './constant/player_mode'
 
+import MusicService from './services/music'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -19,7 +21,7 @@ export default new Vuex.Store({
   mutations: {
     initList (state, list) {
       state.playList = list
-      state.curMusicId = state.playList[0].id || 0
+      state.curMusicId = state.playList[0].objectId || 0
     },
     playMusic (state, musicId) {
       state.curMusicId = musicId
@@ -60,8 +62,8 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    initList ({ commit }) {
-      let list = testlist
+    async initList ({ commit }) {
+      let list = await MusicService.getInstance().list() // testlist
       commit('initList', list)
     },
     play ({ commit }, musicId) {
@@ -76,24 +78,30 @@ export default new Vuex.Store({
         commit('updateTime')
       }, 1000)
       commit('resetLog')
-      commit('start', timeId)
-      commit('addLog',{
-        time: new Date().getTime(),
-        operation: 'start'
+      setTimeout(() => {
+        commit('start', timeId)
+        commit('addLog',{
+          time: new Date().getTime(),
+          operation: 'start'
+        })
       })
     },
     stop ({ commit }) {
       commit('stop')
-      commit('addLog',{
-        time: new Date().getTime(),
-        operation: 'stop'
+      setTimeout(() => {
+        commit('addLog',{
+          time: new Date().getTime(),
+          operation: 'stop'
+        })
       })
     },
     pause ({ commit }) {
       commit('pause')
-      commit('addLog',{
-        time: new Date().getTime(),
-        operation: 'pause'
+      setTimeout(() => {
+        commit('addLog',{
+          time: new Date().getTime(),
+          operation: 'pause'
+        })
       })
     }
   }
