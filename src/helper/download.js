@@ -10,7 +10,7 @@ export default class DownloadHelper {
   static checkExistsList (list) {
     for (let i = 0; i < list.length; i++) {
       if (!list[i].path || list[i].path.length === 0) continue
-      list[i].filename = list[i].path.substring(list[i].path.lastIndexOf('/')+1, list[i].path.lastIndexOf('.')) + '.dat'
+      list[i].filename = list[i].path.substring(list[i].path.lastIndexOf('/')+1)
       list[i].absolutePath = path.resolve(MUSIC_STORE_PATH,list[i].filename)
       console.log(path.resolve(MUSIC_STORE_PATH,list[i].filename))
       list[i].isDownload = fs.existsSync(path.resolve(MUSIC_STORE_PATH,list[i].filename))
@@ -30,11 +30,6 @@ export default class DownloadHelper {
 
   static downloadDone (event, data) {
     // 下载完成后转换成dat
-    let music = store.state.playList.find(e => e.objectId === data.objectId)
-    let mp3File = fs.readFileSync(music.absolutePath)
-    let datFile = 'data:audio/mpeg;base64,' + mp3File.toString('base64')
-    console.log(datFile)
-    fs.writeFileSync(music.absolutePath, datFile)
     setTimeout (() => {
       store.dispatch('downloadDone', data.objectId)
     }, 1200)

@@ -59,26 +59,6 @@ export default new Vuex.Store({
         state.countTime --
       }
     },
-    download (state, musicId) {
-      let music = state.playList.find(e => e.objectId === musicId)
-      let ind = state.playList.findIndex(e => e.objectId === musicId)
-      music.isDownloading = true
-      Vue.set(state.playList, ind, music)
-    },
-    downloadDone (state, musicId) {
-      let music = state.playList.find(e => e.objectId === musicId)
-      let ind = state.playList.findIndex(e => e.objectId === musicId)
-      music.isDownloading = false
-      music.isDownload = true
-      Vue.set(state.playList, ind, music)
-    },
-    updateDownloadProgress (state, payload) {
-      if (!state.downloadProgress[payload.objectId]) {
-        Vue.set(state.downloadProgress, payload.objectId, 0)
-      }
-
-      Vue.set(state.downloadProgress, payload.objectId, payload.progress)
-    },
     resetLog(state) {
       state.focusLog = []
     },
@@ -98,14 +78,12 @@ export default new Vuex.Store({
         try {
           await db.open();
           var configs = await db.config.toArray();
-          console.log(configs)
           let curVersion = configs.find(e => e.key === 'version') 
           if ((curVersion ? curVersion.value : '0.0.0') < newVersion.value) {
             needUpdate = true
           }
 
           let list = []
-          console.log(needUpdate)
           if (needUpdate) {
             list = await Service('Music').list() // testlist
             // store to local
@@ -123,12 +101,7 @@ export default new Vuex.Store({
             // db.config.update(curVersion.)
           } else {
             list = await db.music.toArray()
-            console.log(list)
           }
-
-          console.log(list)
-          // check is download 
-          DownloadHelper.checkExistsList(list)
 
           commit('initList', list)
         } finally {
@@ -171,7 +144,7 @@ export default new Vuex.Store({
       })
     },
     pause ({ commit }) {
-      MusicPlayer.stop()
+      MusicPlayer.pause()
       commit('pause')
       setTimeout(() => {
         commit('addLog',{
@@ -179,16 +152,6 @@ export default new Vuex.Store({
           operation: 'pause'
         })
       })
-    },
-    download({ commit, state }, musicId) {
-      commit('download', musicId)
-      DownloadHelper.download(state.playList.find(e => e.objectId === musicId))
-    },
-    downloadDone({ commit }, musicId) {
-      commit('downloadDone', musicId)
-    },
-    updateDownloadProgress({commit}, payload) {
-      commit('updateDownloadProgress',payload)
     }
   }
 })

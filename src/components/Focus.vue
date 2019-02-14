@@ -1,10 +1,7 @@
 <template>
 <div class="focus">
-    <button @click="start" v-show="mode === PLAYER_MODE.STOP && curMusic.isDownload">
+    <button @click="start" v-show="mode === PLAYER_MODE.STOP">
         开始专注
-    </button>    
-    <button @click="download" v-show="mode === PLAYER_MODE.STOP && !curMusic.isDownload && !curMusic.isDownloading">
-        下载
     </button>      
     <button @click="start" v-show="mode === PLAYER_MODE.PAUSE">
         继续专注
