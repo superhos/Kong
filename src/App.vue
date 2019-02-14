@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  mounted () {
+  async mounted () {
     this.$store.dispatch('initList')
   }
 }

@@ -2,8 +2,10 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { remote } from 'electron'
 import PLAYER_MODE from './constant/player_mode'
+import LOG from './constant/log'
 import DownloadHelper from './helper/download'
 import MusicPlayer from './helper/music-player'
+import Timer from './helper/timer'
 
 import Service from './services/service'
 
@@ -14,10 +16,13 @@ export default new Vuex.Store({
     curMusicId: null,
     playList: [],
     showBg: true,
+    showResult: false,
     roundTime: 1500,
     countTime: 1500,
     timeId: 0,
+    logTimeId: 0,
     focusLog: [],
+    allLog: [],
     downloadProgress: {},
     mode: PLAYER_MODE.STOP
   },
@@ -32,42 +37,47 @@ export default new Vuex.Store({
     triggerBg (state, isShow) {
       state.showBg = isShow
     },
-    start (state, timeId) {
+    start (state, payload) {
       state.mode = PLAYER_MODE.PLAYING
-      state.timeId = timeId
+      state.timeId = payload.timeId
+      state.logTimeId = payload.logTimeId
     },
     stop (state) {
-      clearTimeout(state.timeId)
+      // clearInterval(state.timeId)
+      MusicPlayer.stop()
+      Timer.remove(state.timeId)
+      Timer.remove(state.logTimeId)
       state.countTime = state.roundTime
       state.mode = PLAYER_MODE.STOP
     },
     pause (state) {
-      clearTimeout(state.timeId)
+      MusicPlayer.pause()
+      Timer.remove(state.timeId)
+      Timer.remove(state.logTimeId)
       state.mode = PLAYER_MODE.PAUSE
     },
     reset (state) {
       state.countTime = state.roundTime
     },
     updateTime (state) {
-      // 一秒调用一次
-      if (state.countTime <= 0) {
-        clearTimeout(state.timeId)
-        MusicPlayer.stop()
-        state.mode = PLAYER_MODE.STOP
-        state.countTime = state.roundTime
-      } else {
-        state.countTime --
-      }
+      state.countTime --
     },
     resetLog(state) {
       state.focusLog = []
     },
     addLog (state, log) {
       state.focusLog.push(log)
+    },
+    allLog (state, logs) {
+      state.allLog = logs
+      Vue.set(state, allLog, logs)
+    },
+    triggerResult (state, isShow) {
+      state.showResult = isShow
     }
   },
   actions: {
-    async initList ({ commit }) {
+    async initList ({ commit, dispatch }) {
       let db = Vue.$db
       let configCollection = db.config
       if (configCollection) {
@@ -104,6 +114,7 @@ export default new Vuex.Store({
           }
 
           commit('initList', list)
+          dispatch('allLog')
         } finally {
           Vue.$db.close();
         }
@@ -115,43 +126,72 @@ export default new Vuex.Store({
     triggerBg ({commit}, isShow) {
       commit('triggerBg', isShow)
     },
-    start ({ commit, state }) {
+    start ({ commit, state, dispatch }) {
       if (state.mode === PLAYER_MODE.PLAYING) return
-      let timeId = setInterval(() => {
-        commit('updateTime')
-      }, 1000)
+
       commit('resetLog')
+      let timeId = Timer.push((setState) => {
+        if (state.countTime <= 0) {
+          dispatch('stop')
+          return
+        }
+
+        if (state.mode !== PLAYER_MODE.PLAYING) return
+        commit('updateTime')
+      })
+      let logTimeId = Timer.push(() => {
+        commit('addLog',{
+          time: new Date().getTime(),
+          operation: LOG.FOCUS
+        })
+      }, 3000)
+
       setTimeout(() => {
-        commit('start', timeId)
+        commit('start', {
+          timeId,
+          logTimeId
+        })
         // Play
         const curMusic = state.playList.find( e => e.objectId === state.curMusicId)
         MusicPlayer.play(curMusic)
 
         commit('addLog',{
           time: new Date().getTime(),
-          operation: 'start'
+          operation: LOG.START
         })
       })
     },
-    stop ({ commit }) {
-      MusicPlayer.stop()
+    stop ({ commit, dispatch }) {
       commit('stop')
+      commit('addLog',{
+        time: new Date().getTime(),
+        operation: LOG.STOP
+      })
       setTimeout(() => {
-        commit('addLog',{
-          time: new Date().getTime(),
-          operation: 'stop'
-        })
+        dispatch('restoreLog')
+        dispatch('triggerResult', true)
       })
     },
-    pause ({ commit }) {
-      MusicPlayer.pause()
+    pause ({ commit }) {  
       commit('pause')
       setTimeout(() => {
         commit('addLog',{
           time: new Date().getTime(),
-          operation: 'pause'
+          operation: LOG.PAUSE
         })
       })
+    },
+    async restoreLog ({ state, dispatch }) {
+      await Vue.$db.open()
+      Vue.$db.log.bulkAdd(state.focusLog)
+      dispatch('allLog')
+    },
+    triggerResult ({ commit }, result) {
+      commit('triggerResult', result)
+    },
+    async allLog ({ commit }) {
+      let logs = await Vue.$db.log.toArray()
+      commit('allLog', logs)
     }
   }
 })

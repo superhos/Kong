@@ -1,5 +1,5 @@
 {
-  "name": "KONG",
+  "name": "kong",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,9 +20,11 @@
     "dotenv": "^6.2.0",
     "electron-dl": "^1.13.0",
     "js-md5": "^0.7.3",
+    "moment": "^2.24.0",
     "play-audio": "0.0.1-security",
     "register-service-worker": "^1.6.1",
     "vue": "^2.6.6",
+    "vue-chartjs": "^3.4.0",
     "vue-radial-progress": "^0.2.10",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"

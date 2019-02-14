@@ -8,6 +8,7 @@
       <div class="bg" :style="musicBgStyle" v-show="showBg">
       </div>
     </transition>
+    <ResultPage :show="showResult"/>
   </div>
 </template>
 
@@ -16,16 +17,20 @@
 import { mapState } from 'vuex'
 import MusicSelector from '@/components/MusicSelector.vue'
 import Focus from '@/components/Focus.vue'
+import ResultPage from '@/components/ResultPage.vue'
+
 
 export default {
   name: 'home',
   data () {
     return {
+      showResult: true
     }
   },
   components: {
     MusicSelector,
-    Focus
+    Focus,
+    ResultPage
   },
   computed: {
     ...mapState(['showBg']),
