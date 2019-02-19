@@ -1,7 +1,6 @@
 import { app } from 'electron'
 const ipcMain = require('electron').ipcMain;
 import path from 'path'
-import fs from 'fs'
 const { download } = require('electron-dl')
 
 const MUSIC_STORE_PATH = `${path.resolve(app.getPath('userData'),'music')}`

@@ -14,7 +14,8 @@
 
 <script>
 // @ is an alias to /src
-import { mapState } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapActions } = createNamespacedHelpers('music/')
 import MusicSelector from '@/components/MusicSelector.vue'
 import Focus from '@/components/Focus.vue'
 import ResultPage from '@/components/ResultPage.vue'
@@ -33,9 +34,9 @@ export default {
     ResultPage
   },
   computed: {
-    ...mapState(['showBg']),
+    ...mapState(['showBg', 'playList','curMusicId']),
     musicBgStyle () {
-      let bg = this.$store.state.playList.find(e => e.objectId == this.$store.state.curMusicId)
+      let bg = this.playList.find(e => e.objectId == this.curMusicId)
       return bg ? bg.style : {}
     }
   }

@@ -1,3 +1,3 @@
 export default {
-  DB: 'KONG_test2'
+  DB: 'KONG_test3'
 }

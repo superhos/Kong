@@ -11,7 +11,7 @@
 <script>
 export default {
   async mounted () {
-    this.$store.dispatch('initList')
+    this.$store.dispatch('music/initList')
   }
 }
 </script>

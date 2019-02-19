@@ -6,6 +6,7 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 import ipcEvent from './events/ipc-event'
+import timerEvent from './events/timer-event'
 
 global.env = process.env
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -31,6 +32,7 @@ function createWindow () {
   }
 
   ipcEvent(win)
+  timerEvent(win)
 
   win.on('closed', () => {
     win = null

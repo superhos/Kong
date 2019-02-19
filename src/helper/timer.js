@@ -1,37 +1,32 @@
-
+const ipcRenderer = require('electron').ipcRenderer
 let tasks = new Map()
 let id = 0
 let isRunning = false
-let last
+let last = 0
 
 export default class Timer {
-  static count (time) {
+  static count () {
     // 每秒执行
+    last += 1000 
     tasks.forEach(task => {
-      if (!task.last || time - task.last >= task.timegap) {
-        if (task.last) {
-          task.func()
-        }
-        task.last = time
-      }
+      if (last % task.timegap === 0) task.func()
     })
 
-    if (tasks.size > 0) {
-      requestAnimationFrame(Timer.count)
-    } else {
-      isRunning = false
+    if (tasks.size <= 0) {
+      Timer.stop()
     }
   }
 
   static push(task, timegap = 1000) {
     tasks.set(++id, {
-      last: null,
+      last: 0,
       func: task,
       timegap
     })
     if (!isRunning) {
       isRunning = true
-      requestAnimationFrame(Timer.count)
+      ipcRenderer.send('timer-start')
+      ipcRenderer.on('timer-per', Timer.count)
     }
 
     return id
@@ -39,5 +34,15 @@ export default class Timer {
 
   static remove(taskId) {
     tasks.delete(taskId)
+    if (tasks.size <= 0) {
+      Timer.stop()
+    }
+  }
+
+  static stop() {
+    last = 0
+    isRunning = false
+    ipcRenderer.send('timer-stop')
+    ipcRenderer.removeListener('timer-per', Timer.count)
   }
 }

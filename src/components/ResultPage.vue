@@ -37,19 +37,26 @@
         <span>* 按8小时工作时间计算</span>
       </div>
     </section>
+    <section>
+      <TodoList />
+    </section>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState } = createNamespacedHelpers('music/')
 import RadialProgressBar from 'vue-radial-progress'
 import LOG from '@/constant/log'
 import moment from 'moment'
 
+import TodoList from '@/components/TodoList.vue'
+
 export default {
   name: 'ResultPage',
   components: {
-    RadialProgressBar
+    RadialProgressBar,
+    TodoList
   },
   data () {
     return {
@@ -95,7 +102,7 @@ export default {
   methods: {
     triggerResult (evt) {
       const target = evt.target.get || evt.srcElement
-      this.$store.dispatch('triggerResult', target.nodeName.toLowerCase() === 'header')
+      this.$store.dispatch('music/triggerResult', target.nodeName.toLowerCase() === 'header')
     }
   }
 }
@@ -109,7 +116,7 @@ export default {
   left: 0;
   width: 100vw;
   height: 90vh;
-  background: #FFF;
+  background: #202020;
   z-index: 999;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -124,10 +131,10 @@ export default {
   }
 
   section {
-    height: calc(100% - 30px);
+    height: calc(60% - 30px);
     
     .top {
-      height: 30%;
+      height: 60%;
       overflow: hidden;
       width: 100%;
       position: relative;
@@ -170,6 +177,11 @@ export default {
       font-size: 13 px;
     }
   }
+
+  section:last-child {
+    height: 40%;
+    margin-top: 30px;
+  }
 }
 
 .result-box.show {
@@ -179,8 +191,8 @@ export default {
 
 .result-box.show section .top {
   background: #7C9AAB;
-  padding-top: 3%;
-  height: 60%;
+  padding: 15px 0;
+  height: 100%;
   // background: #e7e7e7;
 }
 

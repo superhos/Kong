@@ -12,7 +12,6 @@ export default class DownloadHelper {
       if (!list[i].path || list[i].path.length === 0) continue
       list[i].filename = list[i].path.substring(list[i].path.lastIndexOf('/')+1)
       list[i].absolutePath = path.resolve(MUSIC_STORE_PATH,list[i].filename)
-      console.log(path.resolve(MUSIC_STORE_PATH,list[i].filename))
       list[i].isDownload = fs.existsSync(path.resolve(MUSIC_STORE_PATH,list[i].filename))
     }
 

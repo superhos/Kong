@@ -30,7 +30,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState } = createNamespacedHelpers('music/')
 import PLAYER_MODE from '../constant/player_mode'
 import RadialProgressBar from 'vue-radial-progress'
 
@@ -74,7 +75,7 @@ export default {
       return this.playList.find(e => e.objectId === this.curMusicId) || {}
     },
     curDownloadSteps () {
-      return this.$store.state.downloadProgress[this.curMusicId] || 0
+      return this.$store.state.music.downloadProgress[this.curMusicId] || 0
     }
   },
   mounted() {
@@ -100,9 +101,9 @@ export default {
       this.slideToId(selectId)
     },
     slideToId (selectId) {
-      if (this.$store.state.curMusicId !== +selectId) {
-        this.$store.dispatch('play', selectId)
-        this.$store.dispatch('triggerBg', false)
+      if (this.$store.state.music.curMusicId !== +selectId) {
+        this.$store.dispatch('music/play', selectId)
+        this.$store.dispatch('music/triggerBg', false)
       }
 
       this.moveTo(this.selectIndex)
@@ -132,7 +133,7 @@ export default {
       ) {
         this.selectorStyle.transform = `translateX(${this.tween.to}px)`
         this.currentX = this.tween.to
-        this.$store.dispatch('triggerBg', true)
+        this.$store.dispatch('music/triggerBg', true)
         return
       }
 

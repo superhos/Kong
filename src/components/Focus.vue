@@ -16,8 +16,9 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import PLAYER_MODE from '../constant/player_mode'
+import { createNamespacedHelpers } from 'vuex'
+const { mapState, mapActions } = createNamespacedHelpers('music/')
+import PLAYER_MODE from '@/constant/player_mode'
 
 export default {
     name: 'Focus',
@@ -27,7 +28,11 @@ export default {
         }
     },
     computed: {
-        ...mapState(['mode','playList','curMusicId']),
+        ...mapState([
+            'mode',
+            'playList',
+            'curMusicId',
+        ]),
         curMusic () {
             return this.playList.find(e => e.objectId === this.curMusicId) || {}
         }
@@ -35,7 +40,7 @@ export default {
     methods: {
         ...mapActions(['start','stop','pause']),
         download () {
-            this.$store.dispatch('download', this.curMusicId)
+            this.$store.dispatch('music/download', this.curMusicId)
         }
     }
 }
